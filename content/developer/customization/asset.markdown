@@ -25,7 +25,7 @@ custom experience.
 All Spree generated (or upgraded) applications include an `app/assets`
 directory (as is standard for all Rails 3.1 apps). We've taken this one
 step further by subdividing each top level asset directory (images,
-JavaScript files, stylesheets) into store and admin directories. This is
+JavaScript files, stylesheets) into frontend and backend directories. This is
 designed to keep assets from the front end (store) and back end (admin)
 from conflicting with each other.
 
@@ -34,18 +34,21 @@ A typical assets directory for a Spree application will look like:
     app
     |-- assets
         |-- images
-        |   |-- store
-        |   |-- admin
+        |   |-- spree
+        |       |-- frontend
+        |       |-- backend
         |-- javascripts
-        |   |-- store
-        |   |   |-- all.js
-        |   |-- admin
-        |       |-- all.js
+        |   |-- spree
+        |       |-- frontend
+        |       |   |-- all.js
+        |       |-- backend
+        |           |-- all.js
         |-- stylesheets
-        |   |-- store
-        |   |   |-- all.css
-        |   |-- admin
-        |       |-- all.css
+        |   |-- spree
+        |       |-- frontend
+        |       |   |-- all.css
+        |       |-- backend
+        |           |-- all.css
 
 Spree also generates four top level manifests (all.css & all.js, see
 above) that require all the core extension's and site specific
@@ -59,27 +62,29 @@ required for that engine.
 
 For example, spree_core provides the following manifests:
 
-    app
+    vendor
     |-- assets
         |-- javascripts
-        |   |-- store
-        |   |   |-- spree_core.js
-        |   |-- admin
-        |       |-- spree_core.js
+        |   |-- spree
+        |       |-- frontend
+        |       |   |-- spree_core.js
+        |       |-- backend
+        |           |-- spree_core.js
         |-- stylesheets
-        |   |-- store
-        |   |   |-- spree_core.css
-        |   |-- admin
-        |       |-- spree_core.css
+        |   |-- spree
+        |       |-- frontend
+        |       |   |-- spree_core.css
+        |       |-- backend
+        |           |-- spree_core.css
 
 These core (engine specific) manifests are included by default by the
 relevant all.css or all.js in the host Spree application. For example,
-`app/assets/javascripts/admin/all.js` includes:
+`vendor/assets/javascripts/spree/backend/all.js` includes:
 
 <% ruby do %>
-    //= require admin/spree_core
-    //= require admin/spree_auth
-    //= require admin/spree_promo
+    //= require spree/backend/spree_core
+    //= require spree/backend/spree_auth
+    //= require spree/backend/spree_promo
     //= require_tree .
 <% end %>
 
@@ -121,8 +126,8 @@ a Rails generator to do so.
 
 For an example of an extension using a generator to install assets and
 migrations take a look at the recently added
-[install_generator](https://github.com/spree/spree_wishlist/blob/rails3-1/lib/generators/spree_wishlist/install/install_generator.rb)
-on the rails3-1 branch of spree_wishlist.
+[install_generator](https://github.com/spree/spree_fancy/blob/master/lib/generators/spree_fancy/install/install_generator.rb)
+on the rails3-1 branch of spree_fancy.
 
 ### Overriding Spree's core assets
 
@@ -141,7 +146,7 @@ include asset files from your extensions / themes).
 Say for example you want to replace the following CSS snippet:
 
 ```css
-/* app/assets/stylesheets/store/screen.css */
+/* vendor/assets/stylesheets/spree/frontend/screen.css */
 
 div#footer {
  clear: both;
@@ -149,10 +154,10 @@ div#footer {
 ```
 
 You can now just create a new stylesheet inside
-`your_app/app/assets/stylesheets/store/` and include the following CSS:
+`your_app/app/assets/stylesheets/spree/frontend/` and include the following CSS:
 
 ```css
-/* app/assets/stylesheets/store/foo.css */
+/* app/assets/stylesheets/spree/frontend/foo.css */
 
 div#footer {
  clear: none;
@@ -160,7 +165,7 @@ div#footer {
 }
 ```
 
-The `store/all.css` manifest will automatically include `foo.css` and it
+The `frontend/all.css` manifest will automatically include `foo.css` and it
 will actually include both definitions with the one from `foo.css` being
 included last, hence it will be the rule applied.
 
@@ -171,8 +176,8 @@ create a file with the same name and save it to the corresponding path
 within your application's or extension's `app/assets/stylesheets`
 directory.
 
-For example, to replace `store/all.css` you would save the replacement
-to `your_app/app/assets/stylesheets/store/all.css`.
+For example, to replace `spree/frontend/all.css` you would save the replacement
+to `your_app/app/assets/stylesheets/spree/frontend/all.css`.
 
 ***
 This same method can also be used to override stylesheets provided by
@@ -185,7 +190,7 @@ A similar approach can be used for JavaScript functions. For example, if
 you wanted to override the `show_variant_images` method:
 
 ```javascript
- // app/assets/javascripts/store/product.js
+ // app/assets/javascripts/spree/frontend/product.js
 
 var show_variant_images = function(variant_id) {
   $('li.vtmb').hide();
@@ -211,18 +216,18 @@ var show_variant_images = function(variant_id) {
 ```
 
 Again, just create a new JavaScript file inside
-`your_app/app/assets/javascripts/store` and include the new method
+`your_app/app/assets/javascripts/spree/frontend` and include the new method
 definition:
 
 ```javascript
- // app/assets/javascripts/store/foo.js
+ // app/assets/javascripts/spree/frontend/foo.js
 
 var show_variant_images = function(variant_id) {
  alert('hello world');
 }
 ```
 
-The resulting `store/all.js` would include both methods, with the latter
+The resulting `frontend/all.js` would include both methods, with the latter
 being the one executed on request.
 
 #### Overriding entire JavaScript files
@@ -232,8 +237,8 @@ need to create a file with the same name and save it to the
 corresponding path within your application's or extension's
 `app/assets/javascripts` directory.
 
-For example, to replace `store/all.js` you would save the replacement to
-`your_app/app/assets/javascripts/store/all.js`.
+For example, to replace `spree/frontend/all.js` you would save the replacement to
+`your_app/app/assets/javascripts/spree/frontend/all.js`.
 
 ***
 This same method can be used to override JavaScript files provided
@@ -247,4 +252,4 @@ the same path within your application or extension as the file you would
 like to replace.
 
 For example, to replace the Spree logo you would simply copy your logo
-to: `your_app/app/assets/images/admin/bg/spree_50.png`.
+to: `your_app/app/assets/images/logo/spree_50.png`.
