@@ -122,8 +122,19 @@ If the order's shipments already have shipping rates selected, you can advance i
 
 If the order doesn't have an assigned shipping rate, make the following request to select one and advance the order's state:
 
-    PUT /api/checkouts/R366605801?order[shipments_attributes][0]
-    [selected_shipping_rate_id]=1&order[shipments_attributes][0][id]=1
+    PUT /api/checkouts/R366605801
+
+With parameters such as these:
+
+<%= json (
+  {
+    "order"=> {
+      :shipments_attributes => [
+        :selected_shipping_rate_id => 1,
+        :id => 1
+      ]
+    }
+  }) %>
 
 ***
 Please ensure you select a shipping rate for each shipment in the order. In the request above, the `selected_shipping_rate_id` should be the id of the shipping rate you want to use and the `id` should be the id of the shipment you are choosing this shipping rate for.
@@ -136,7 +147,25 @@ Please ensure you select a shipping rate for each shipment in the order. In the 
 
 ## Confirm
 
-To advance to the next state, `confirm`, the order will need to have a payment.
+To advance to the next state, `confirm`, the order will need to have a payment. You can create a payment by passing in parameters such as this:
+
+<%= json ({"order"=>
+  {"payments_attributes"=>{"payment_method_id"=>"1"},
+   "payment_source"=>
+    {"1"=>
+      {"number"=>"1",
+       "month"=>"1",
+       "year"=>"2017",
+       "verification_value"=>"123",
+       "first_name"=>"John",
+       "last_name"=>"Smith"}
+    }
+  }
+}) %>
+
+***
+The numbered key in the `payment_source` hash directly corresponds to the `payment_method_id` attribute within the `payment_attributes` key. 
+***
 
 If the order already has a payment, you can advance it to the `confirm` state by making this request:
 
